@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CATS, FREQ, FREQ_ORDER, getCat } from '../data.js'
 import { C, SL, IB, DB, PB, GB } from '../theme.js'
 import { daysUntil } from '../utils.js'
-import{Pill,FreqFilterBar,Dot,StatusChip}from'../components/Atoms.jsx'
+import{Pill,FreqBar,Dot,StatusChip}from'../components/Atoms.jsx'
 import EqModal from '../components/EqModal.jsx'
 import TaskModal from '../components/TaskModal.jsx'
 
@@ -32,7 +32,7 @@ export default function ScheduleTab({ eq, sched, saveEq, deleteEq, saveTask, del
           {CATS.map(c => <Pill key={c.id} label={`${c.icon} ${c.label}`} active={selCat === c.id} onClick={() => setSelCat(c.id)} />)}
         </div>
         <div style={{ ...SL, marginBottom: 6 }}>Frequency</div>
-        <FreqFilterBar selFreq={selFreq} setSelFreq={setSelFreq} />
+        <FreqBar selFreq={selFreq} setSelFreq={setSelFreq} />
       </div>
 
       {/* Equipment accordion */}
