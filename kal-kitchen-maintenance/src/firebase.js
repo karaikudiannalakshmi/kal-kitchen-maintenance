@@ -1,79 +1,46 @@
 import { initializeApp } from 'firebase/app'
 import {
-  getFirestore,
-  collection,
-  doc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  onSnapshot,
-  writeBatch,
-  getDocs,
+  getFirestore, collection, doc,
+  setDoc, updateDoc, deleteDoc,
+  onSnapshot, writeBatch,
 } from 'firebase/firestore'
 
-// All values come from Vercel environment variables (VITE_ prefix exposes them to browser)
 const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey:            "AIzaSyBkAo5Hv4w9QxQB9-7UZRom8EC5zH2UCTw",
+  authDomain:        "kal-kitchen-maintenance.firebaseapp.com",
+  projectId:         "kal-kitchen-maintenance",
+  storageBucket:     "kal-kitchen-maintenance.firebasestorage.app",
+  messagingSenderId: "767517122091",
+  appId:             "1:767517122091:web:a03baae5e28e81d453d46e",
 }
 
 const app = initializeApp(firebaseConfig)
 export const db = getFirestore(app)
 
-// ── Collection names ──────────────────────────────────────────────────────
-// Prefix isolates this app from other apps sharing the same Firestore project
 export const COLS = {
   equipment: 'km_equipment',
   schedule:  'km_schedule',
   repairs:   'km_repairs',
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
+export const fsSet    = (col, id, data) => setDoc(doc(db, col, id), data)
+export const fsUpdate = (col, id, data) => updateDoc(doc(db, col, id), data)
+export const fsDel    = (col, id)       => deleteDoc(doc(db, col, id))
 
-/** Write a single document (creates or overwrites) */
-export function fsSet(colName, id, data) {
-  return setDoc(doc(db, colName, id), data)
-}
-
-/** Merge-update a single document (only changed fields) */
-export function fsUpdate(colName, id, data) {
-  return updateDoc(doc(db, colName, id), data)
-}
-
-/** Delete a single document */
-export function fsDel(colName, id) {
-  return deleteDoc(doc(db, colName, id))
-}
-
-/** Write many documents in one atomic batch (max 500) */
 export async function fsBatchSet(colName, items) {
+  if (!items.length) return
   const batch = writeBatch(db)
-  items.forEach(item => {
-    batch.set(doc(db, colName, item.id), item)
-  })
+  items.forEach(item => batch.set(doc(db, colName, item.id), item))
   return batch.commit()
 }
 
-/** Delete many documents in one atomic batch */
 export async function fsBatchDel(colName, ids) {
+  if (!ids.length) return
   const batch = writeBatch(db)
-  ids.forEach(id => {
-    batch.delete(doc(db, colName, id))
-  })
+  ids.forEach(id => batch.delete(doc(db, colName, id)))
   return batch.commit()
 }
 
-/** Read all documents once, returns array */
-export async function fsGetAll(colName) {
-  const snap = await getDocs(collection(db, colName))
-  return snap.docs.map(d => d.data())
-}
-
-/** Real-time subscription to a collection; returns unsubscribe fn */
 export function fsSubscribe(colName, callback) {
   return onSnapshot(collection(db, colName), snap => {
     callback(snap.docs.map(d => d.data()))
