@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CATS, FREQ, FREQ_ORDER, getCat } from '../data.js'
 import { C, SL, IB, DB, PB, GB } from '../theme.js'
 import { daysUntil } from '../utils.js'
-import { Pill, FreqFilterBar, Dot, StatusChip } from '../components/Atoms.jsx'
+import{Pill,FreqFilterBar,Dot,StatusChip}from'../components/Atoms.jsx'
 import EqModal from '../components/EqModal.jsx'
 import TaskModal from '../components/TaskModal.jsx'
 
