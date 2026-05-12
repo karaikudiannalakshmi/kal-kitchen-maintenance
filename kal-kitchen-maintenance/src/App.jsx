@@ -72,7 +72,19 @@ export default function App() {
   }
   async function deleteRepair(id) { if(!confirm('Delete this repair record?')) return; await fsDel(COLS.repairs,id) }
 
-  const ctx={eq,sched,repairs,saveEq,deleteEq,saveTask,deleteTask,markDone,toggleEnabled,saveRepair,deleteRepair}
+
+  // Duplicate equipment — copies equipment + all its current PM tasks
+  async function duplicateEq(source) {
+    const newEq = { ...source, id: uid(), name: source.name + " (Copy)" }
+    await fsSet(COLS.equipment, newEq.id, newEq)
+    const sourceTasks = sched.filter(s => s.eqId === source.id)
+    if (sourceTasks.length > 0) {
+      const newTasks = sourceTasks.map(t => ({...t, id: uid(), eqId: newEq.id, lastDone: null, nextDue: null}))
+      await fsBatchSet(COLS.schedule, newTasks)
+    }
+  }
+
+  const ctx={eq,sched,repairs,saveEq,deleteEq,saveTask,deleteTask,markDone,toggleEnabled,saveRepair,deleteRepair,duplicateEq}
 
   if (loading) return (
     <div style={{minHeight:'100vh',background:C.bg,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:16}}>
